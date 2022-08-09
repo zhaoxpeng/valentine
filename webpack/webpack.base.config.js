@@ -3,6 +3,7 @@ const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 const isDebug = process.env.NODE_ENV !== 'production';
 const host = '0.0.0.0';
@@ -66,15 +67,18 @@ const base = {
   },
   plugins: [
     new ProgressBarPlugin(),
+    new CopyPlugin([
+      { from: path.resolve(process.cwd(), './test.html'), to: path.resolve(releasePath, './test.html') }
+    ]),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.resolve(process.cwd(), './index.html')
-    })
+    }),
   ]
 };
 
 if (isDebug) {
-  base.entry.unshift('react-hot-loader/patch',  `webpack-dev-server/client?http://${host}:${port}`, 'webpack/hot/dev-server');
+  base.entry.unshift('react-hot-loader/patch', `webpack-dev-server/client?http://${host}:${port}`, 'webpack/hot/dev-server');
   base.plugins.unshift(new webpack.HotModuleReplacementPlugin());
   base.devtool = 'source-map';
 } else {

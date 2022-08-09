@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <ul id="js-list"></ul>
+</body>
+<style>
+    ul#js-list {
+        padding: 0px;
+        display: flex;
+        flex-wrap: wrap
+    }
+
+    li {
+        list-style: none;
+        text-align: center;
+        line-height: 50px;
+        width: 50px;
+        height: 50px;
+        border: 1px solid #000;
+    }
+</style>
+
+<script>
+    (() => {
+        const ndContainer = document.getElementById('js-list');
+        if (!ndContainer) {
+            return;
+        }
+
+        const total = 30000;
+        const batchSize = 4; // 每批插入的节点次数，越大越卡
+        const batchCount = total / batchSize; // 需要批量处理多少次
+        let batchDone = 0;  // 已经完成的批处理个数
+
+        var getRandomColor = function () {
+            return '#' + Math.floor(Math.random() * 16777215).toString(16);
+        }
+        function appendItems() {
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < batchSize; i++) {
+                const ndItem = document.createElement('li');
+                ndItem.innerText = (batchDone * batchSize) + i + 1;
+                ndItem.style.backgroundColor = getRandomColor()
+                fragment.appendChild(ndItem);
+            }
+
+            // 每次批处理只修改 1 次 DOM
+            ndContainer.appendChild(fragment);
+
+            batchDone += 1;
+            doBatchAppend();
+        }
+
+        function doBatchAppend() {
+            if (batchDone < batchCount) {
+                window.requestAnimationFrame(appendItems);
+            }
+        }
+
+        // kickoff
+        doBatchAppend();
+
+        ndContainer.addEventListener('click', function (e) {
+            const target = e.target;
+            if (target.tagName === 'LI') {
+                alert(target.innerHTML);
+            }
+        });
+    })();
+</script>
+
+</html>
